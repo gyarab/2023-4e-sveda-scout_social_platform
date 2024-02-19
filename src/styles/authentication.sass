@@ -1,0 +1,83 @@
+@import 'globals'
+
+.sign-box
+  flex-direction: column
+  height: auto
+  min-height: 100vh
+
+.auth-box
+  width: 95%
+  background: $background-top
+  max-width: 550px
+  padding: $padding * 3
+  margin: $margin
+  flex-direction: column
+  align-items: flex-start
+  justify-content: flex-start
+  box-shadow: $basic-shadow
+
+.credential-group-box
+  flex-direction: column
+  align-items: flex-start !important
+  justify-content: flex-start !important
+
+  .credential-box
+    flex-direction: column
+    align-items: flex-start
+    color: $dark-gray
+
+    p
+      margin: $margin 0 3px 5px
+      font-size: $regular-font-size
+
+    .required:after
+      content: '*'
+      color: red
+
+    input
+      border: 0.75px $light-gray solid
+      border-radius: $form-input-border-radius
+      font-size: $small-font-size
+      padding: $padding / 2 + 1px
+      width: 100%
+
+    input:focus
+      outline: none
+
+.submit-box
+  margin-top: $margin / 2
+  justify-content: flex-end
+
+.submit-button
+  border: none
+  background: $light-blue
+  color: white
+  $size: 40px
+  width: $size
+  height: $size
+  margin-top: $margin
+  border-radius: 50%
+  font-size: 20px
+  transform: scaleX(-1)
+  display: flex
+  align-items: center
+  justify-content: center
+
+.submit-button:hover
+  box-shadow: $basic-shadow
+
+.secondary-button
+  background: $background-top
+  border: none
+  outline: none
+  box-shadow: none
+  padding: unset
+  margin: 0 0 0 $padding / 2
+  font-weight: 500
+  color: $light-blue
+  font-size: $regular-font-size - 2px
+
+.secondary-button:hover
+  border-bottom: 0.75px solid $light-blue
+
+
