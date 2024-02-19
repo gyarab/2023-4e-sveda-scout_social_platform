@@ -67,8 +67,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         // get hashed password
         const getHashedPasswordQuery: string = 'select password from users where username=$1'
         const getHashedPasswordResult: QueryResult = await client.query(getHashedPasswordQuery, [userData.username])
-
-
         console.log(getHashedPasswordResult.rows[0])
 
         const hashedPassword = getHashedPasswordResult.rows[0].password.split('%')
@@ -85,11 +83,24 @@ export async function POST(req: NextRequest, res: NextResponse) {
             })
         }
 
-        // create session for logged user
-        const sessionQuery: string = 'insert into sessions values (DEFAULT, DEFAULT, $1, (select id from users where username=$2));'
-        const expirationTime: number = getExpirationTime()
+        // revalidate session if the user was already signed in
+        const checkAlreadySignedQuery: string = 'select count(token) from sessions inner join users on user_id = users.id where username=$1 and expires_on>$2'
+        const checkAlreadySignedResult: QueryResult = await client.query(checkAlreadySignedQuery, [userData.username, getTimeMs()])
 
-        await client.query(sessionQuery, [expirationTime, userData.username])
+        if (Number.parseInt(checkAlreadySignedResult.rows[0].count) < 1) {
+            // create session for logged user
+            const sessionQuery: string = 'insert into sessions values (DEFAULT, DEFAULT, $1, (select id from users where username=$2));'
+
+            await client.query(sessionQuery, [getExpirationTime(), userData.username])
+        } else {
+            // revalidate session
+            const revalidateQuery: string = 'update sessions set expires_on=$1 where user_id=(select id from users where username=$2) and expires_on>$3'
+            await client.query(revalidateQuery, [getExpirationTime(), userData.username, getTimeMs()])
+        }
+
+        // delete all expired sessions
+        const deleteExpiredSessionsQuery: string = 'delete from sessions where expires_on<$1'
+        await client.query(deleteExpiredSessionsQuery, [getTimeMs()])
 
         // get token for auth
         const getTokenQuery: string = 'select token from sessions inner join users on user_id = users.id where username=$1 and expires_on>$2;'

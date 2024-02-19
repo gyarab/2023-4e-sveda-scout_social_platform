@@ -2,7 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import {SafeParseReturnType, z, ZodString} from 'zod'
 import pool from '../../../../database/db'
 import {PoolClient, QueryResult} from "pg";
-import {getTimeMs} from "@/utils/utils";
+import {getExpirationTime, getTimeMs} from "@/utils/utils";
 import { cookies } from 'next/headers'
 
 const tokenScheme: ZodString = z.string().length(36)
@@ -46,7 +46,11 @@ export async function GET() {
             })
         }
 
-        // get hashed password
+        // revalidate session
+        const revalidateQuery: string = 'update sessions set expires_on=$1 where token=$2 and expires_on>$3'
+        await client.query(revalidateQuery, [getExpirationTime(), token.data, getTimeMs()])
+
+        // get username
         const navDataQuery: string = 'select username from users inner join sessions on users.id = user_id where token=$1 and expires_on>$2'
         const navDataResult: QueryResult = await client.query(navDataQuery,[token.data, getTimeMs()])
         const userInfo = navDataResult.rows[0]
