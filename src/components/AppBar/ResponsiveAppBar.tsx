@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react';
+import {useEffect, useState} from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,7 +18,6 @@ import SpaRoundedIcon from '@mui/icons-material/SpaRounded';
 import Link from "next/link";
 import axios from "axios";
 import {useRouter} from "next/navigation";
-import {useEffect, useState} from "react";
 
 const pages = [
     {
@@ -30,7 +30,7 @@ const pages = [
     },
     {
         name: 'Messages',
-        href: '/messages/direct'
+        href: '/messages'
     }, {
         name: 'Plans',
         href: '/plans'
@@ -46,13 +46,13 @@ function ResponsiveAppBar() {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
-    const [navData, setNavData] = useState<{username: string}>({
+    const [navData, setNavData] = useState<{ username: string }>({
         username: ''
     })
 
     const router = useRouter()
 
-    useEffect(  () => {
+    useEffect(() => {
         const fetchData = async () => {
             const userInfo = await getNavData()
             setNavData(userInfo)
@@ -193,7 +193,7 @@ function ResponsiveAppBar() {
                     <Box sx={{flexGrow: 0}}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                <Avatar alt={navData.username} src="/static/images/avatar/2.jpg"/>
+                                <Avatar alt={navData.username.toUpperCase()} src="/static/images/avatar/2.jpg"/>
                             </IconButton>
                         </Tooltip>
                         <Menu
