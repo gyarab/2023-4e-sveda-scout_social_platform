@@ -1,11 +1,11 @@
 'use client'
 import * as React from 'react';
+import {useRef, useState} from 'react';
 import {Card, CardActions, CardContent, Container, Stack, TextField} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import theme from "@/components/ThemeRegistry/theme";
 import Button from "@mui/material/Button";
-import {useRef, useState} from "react";
-import {LogInUserData, SignError, SignUpUserData} from "@/utils/interfaces";
+import {LogInUserData, SignError} from "@/utils/interfaces";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {useRouter} from "next/navigation";
 import axios from "axios";
@@ -52,7 +52,7 @@ export default function SignIn() {
         setPasswordErr({isErr: false, message: ''})
     }
 
-    const handleSubmit = async (e:any) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
 
         resetAllErrs()
@@ -76,6 +76,11 @@ export default function SignIn() {
         })
 
         console.log(user)
+    }
+
+    const handleKeyDown = (e: any) => {
+        if (e.key === 'Enter')
+            handleSubmit(e)
     }
 
     return (
@@ -119,6 +124,7 @@ export default function SignIn() {
                         name="username"
                         autoComplete="username"
                         autoFocus
+                        onKeyDown={handleKeyDown}
                     />
                     <TextField
                         error={passwordErr.isErr}
@@ -132,6 +138,7 @@ export default function SignIn() {
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        onKeyDown={handleKeyDown}
                     />
                 </CardContent>
                 <CardActions

@@ -134,6 +134,11 @@ export default function SignUp() {
         //console.log(user)
     }
 
+    const handleKeyDown = (e: any) => {
+        if (e.key === 'Enter')
+            handleSubmit(e)
+    }
+
     return (
         <Container
             sx={{
@@ -174,6 +179,7 @@ export default function SignUp() {
                         label="Username"
                         name="username"
                         autoFocus
+                        onKeyDown={handleKeyDown}
                     />
                     <TextField
                         inputRef={nicnameRef}
@@ -182,7 +188,7 @@ export default function SignUp() {
                         id="nickname"
                         label="Nickname"
                         name="nickname"
-                        autoFocus
+                        onKeyDown={handleKeyDown}
                     />
                     <TextField
                         error={emailErr.isErr}
@@ -194,7 +200,7 @@ export default function SignUp() {
                         id="email"
                         label="Email"
                         name="email"
-                        autoFocus
+                        onKeyDown={handleKeyDown}
                     />
                     <TextField
                         error={passwordErr.isErr}
@@ -207,6 +213,7 @@ export default function SignUp() {
                         label="Password"
                         type="password"
                         id="password"
+                        onKeyDown={handleKeyDown}
                     />
                     <TextField
                         error={passwordAgainErr.isErr}
@@ -219,6 +226,7 @@ export default function SignUp() {
                         label="Password"
                         type="password"
                         id="password"
+                        onKeyDown={handleKeyDown}
                     />
                 </CardContent>
                 <CardActions
