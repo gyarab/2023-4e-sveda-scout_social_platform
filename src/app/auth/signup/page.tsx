@@ -154,6 +154,8 @@ export default function SignUp() {
                     backgroundColor: theme.palette.secondary.light,
                     boxShadow: 20,
                     maxWidth: '484px',
+                    marginTop: 4,
+                    marginBottom: 4,
                 }}
             >
                 <CardContent>
@@ -263,110 +265,3 @@ export default function SignUp() {
         </Container>
     );
 }
-
-/*
-<div className={'box sign-box'}>
-            {
-                islogPage ?
-                    <div className={'box auth-box outer-border-radius margin'}>
-                        <h1>Please sign in</h1>
-                        <div
-                            className={'box credential-group-box'}
-                        >
-                            <div
-                                className={'box credential-box'}
-                            >
-                                <p>username</p>
-                                <input type="text"/>
-                            </div>
-                            <div
-                                className={'box credential-box'}
-                            >
-                                <p>password</p>
-                                <input type="password"/>
-                            </div>
-                        </div>
-                        <div
-                            className={'box submit-box'}
-                        >
-                            <button
-                                type={'submit'}
-                                className={'submit-button'}
-                            >
-                                <BiArrowBack/>
-                            </button>
-                        </div>
-                        <button
-                            type={'button'}
-                            className={'secondary-button'}
-                            onClick={() => changePage(false)}
-                        >
-                            sign up
-                        </button>
-                    </div>
-                    :
-                    <div className={'box auth-box outer-border-radius margin'}>
-                        <h1>Please sign up</h1>
-                        <div
-                            className={'box credential-group-box'}
-                        >
-                            <div
-                                className={'box credential-box'}
-                            >
-                                <p className={'required'}>
-                                    username
-                                </p>
-                                <input type="text"/>
-                            </div>
-                            <div
-                                className={'box credential-box'}
-                            >
-                                <p>nickname</p>
-                                <input type="text"/>
-                            </div>
-                            <div
-                                className={'box credential-box'}
-                            >
-                                <p className={'required'}>
-                                    e-mail
-                                </p>
-                                <input type="email"/>
-                            </div>
-                            <div
-                                className={'box credential-box'}
-                            >
-                                <p className={'required'}>
-                                    password
-                                </p>
-                                <input type="password"/>
-                            </div>
-                            <div
-                                className={'box credential-box'}
-                            >
-                                <p className={'required'}>
-                                    password
-                                </p>
-                                <input type="password"/>
-                            </div>
-                        </div>
-                        <div
-                            className={'box submit-box'}
-                        >
-                            <button
-                                type={'submit'}
-                                className={'submit-button'}
-                            >
-                                <BiArrowBack/>
-                            </button>
-                        </div>
-                        <button
-                            type={'button'}
-                            className={'secondary-button'}
-                            onClick={() => changePage(true)}
-                        >
-                            sign in
-                        </button>
-                    </div>
-            }
-        </div>
- */
