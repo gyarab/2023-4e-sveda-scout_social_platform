@@ -18,6 +18,7 @@ import SpaRoundedIcon from '@mui/icons-material/SpaRounded';
 import Link from "next/link";
 import axios from "axios";
 import {useRouter} from "next/navigation";
+import theme from "@/components/ThemeRegistry/theme";
 
 const pages = [
     {
@@ -96,7 +97,9 @@ function ResponsiveAppBar() {
     ];
 
     return (
-        <AppBar position={"absolute"}>
+        <AppBar
+            position={"fixed"}
+        >
             <Container maxWidth={"xl"}>
                 <Toolbar disableGutters>
                     <SpaRoundedIcon sx={{display: {xs: 'none', md: 'flex'}, mr: 1}}/>
@@ -193,7 +196,13 @@ function ResponsiveAppBar() {
                     <Box sx={{flexGrow: 0}}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                <Avatar alt={navData.username.toUpperCase()} src="/static/images/avatar/2.jpg"/>
+                                <Avatar
+                                    alt={navData.username.toUpperCase()}
+                                    src="/static/images/avatar/2.jpg"
+                                    sx={{
+                                        backgroundColor: theme.palette.secondary.light
+                                    }}
+                                />
                             </IconButton>
                         </Tooltip>
                         <Menu
