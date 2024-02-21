@@ -16,6 +16,15 @@ export interface LogInUserData {
     password: string
 }
 
-export interface SignToken {
-    token: string
+export interface ChatListItemProps {
+    avatar: {
+        username: string,
+        image: string
+    },
+    text: {
+        primary: string,
+    },
+    badge: {
+        color: string,
+    }
 }
