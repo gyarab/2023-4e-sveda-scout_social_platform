@@ -38,31 +38,11 @@ const pages = [
     }
 ];
 
-const getNavData = async () => {
-    const res = await axios.get('/api/user/navdata')
-    return res.data
-}
-
 function ResponsiveAppBar() {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
-    const [navData, setNavData] = useState<{ username: string }>({
-        username: ''
-    })
-
     const router = useRouter()
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const userInfo = await getNavData()
-            setNavData(userInfo)
-        }
-
-        fetchData().catch((err) => {
-            router.push('/auth/signin')
-        })
-    }, []);
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
@@ -197,7 +177,7 @@ function ResponsiveAppBar() {
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
                                 <Avatar
-                                    alt={navData.username.toUpperCase()}
+                                    alt={'User'}
                                     src="/static/images/avatar/2.jpg"
                                     sx={{
                                         backgroundColor: theme.palette.secondary.light
