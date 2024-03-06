@@ -4,54 +4,73 @@ import React from "react";
 import Typography from "@mui/material/Typography";
 import {ChatListItemProps} from "@/utils/interfaces";
 import theme from "@/components/ThemeRegistry/theme";
+import Button from "@mui/material/Button";
 
 export default function ChatListItem(props: ChatListItemProps) {
     return (
         <Badge
-            // @ts-ignore
-            color={props.badge.color}
             badgeContent=" "
             sx={{
-                transform: 'translate(-2px, 10px)'
+                transform: 'translate(-2px, 10px)',
+                "& .MuiBadge-badge": {
+                    backgroundColor: props.badge.color,
+                    boxShadow: 5
+                },
             }}
         >
-            <ListItem
-                alignItems="flex-start"
+            {
+                // remove upper case on buttons
+            }
+            <Button
+                variant={'text'}
+                onClick={props.click}
                 sx={{
-                    backgroundColor: theme.palette.secondary.light,
-                    borderRadius: 2,
-                    borderTopRightRadius: 0,
+                    transform: 'translate(2px, -10px)',
+                    padding: 0,
                     marginTop: '5px',
                     marginBottom: '5px',
-                    transform: 'translate(2px, -10px)'
+                    borderRadius: 2,
+                    borderTopRightRadius: 0,
+                    textTransform: 'none'
                 }}
             >
-                <ListItemAvatar>
-                    <Avatar
-                        alt={props.avatar.username}
-                        src={props.avatar.image}
-                        sx={{
-                            backgroundColor: theme.palette.secondary.light
-                        }}
+                <ListItem
+                    alignItems="flex-start"
+                    sx={{
+                        backgroundColor: theme.palette.secondary.light,
+                        borderRadius: 2,
+                        borderTopRightRadius: 0,
+                        boxShadow: 5
+                    }}
+                >
+                    <ListItemAvatar>
+                        <Avatar
+                            alt={props.avatar.username}
+                            src={props.avatar.image}
+                            sx={{
+                                backgroundColor: theme.palette.secondary.light,
+                                border: 1
+                            }}
+                        />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary={props.text.primary}
+                        secondary={
+                            <React.Fragment>
+                                <Typography
+                                    sx={{display: 'inline'}}
+                                    component="span"
+                                    variant="body2"
+                                    color="text.primary"
+                                >
+                                    Ali Connors
+                                </Typography>
+                                {" — I'll be in your neighborhood doing errands this…"}
+                            </React.Fragment>
+                        }
                     />
-                </ListItemAvatar>
-                <ListItemText
-                    primary={props.text.primary}
-                    secondary={
-                        <React.Fragment>
-                            <Typography
-                                sx={{display: 'inline'}}
-                                component="span"
-                                variant="body2"
-                                color="text.primary"
-                            >
-                                Ali Connors
-                            </Typography>
-                            {" — I'll be in your neighborhood doing errands this…"}
-                        </React.Fragment>
-                    }
-                />
-            </ListItem>
+                </ListItem>
+            </Button>
         </Badge>
     )
 }
