@@ -187,11 +187,14 @@ create table if not exists message_groups
 (
     id              bigserial primary key,
     name            varchar not null,
-    is_direct_group boolean default true
+    type            varchar not null,
+    edited_on      bigint  not null
 );
 
 create table if not exists message_group_members
 (
+    id               bigserial primary key,
+    added_on         bigint not null,
     is_admin         boolean default false,
     user_id          bigint not null references users,
     message_group_id bigint not null references message_groups
@@ -201,6 +204,7 @@ create table if not exists messages
 (
     id               bigserial primary key,
     message          varchar not null,
+    sent_on          bigint  not null,
     user_id          bigint  not null references users,
     message_group_id bigint  not null references message_groups
 );
