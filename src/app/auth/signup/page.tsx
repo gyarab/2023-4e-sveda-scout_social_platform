@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import theme from "@/components/ThemeRegistry/theme";
 import Button from "@mui/material/Button";
 import axios from "axios";
-import {SignError, SignUpUserData} from "@/utils/interfaces";
+import {FetchError, SignUpUserData} from "@/utils/interfaces";
 import {useRouter} from "next/navigation";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 
@@ -25,23 +25,23 @@ export default function SignUp() {
         passwordAgain: ''
     })
 
-    const [usernameErr, setUsernameErr] = useState<SignError>({
+    const [usernameErr, setUsernameErr] = useState<FetchError>({
         isErr: false,
         message: ''
     })
-    const [nicknameErr, setNicknameErr] = useState<SignError>({
+    const [nicknameErr, setNicknameErr] = useState<FetchError>({
         isErr: false,
         message: ''
     })
-    const [emailErr, setEmailErr] = useState<SignError>({
+    const [emailErr, setEmailErr] = useState<FetchError>({
         isErr: false,
         message: ''
     })
-    const [passwordErr, setPasswordErr] = useState<SignError>({
+    const [passwordErr, setPasswordErr] = useState<FetchError>({
         isErr: false,
         message: ''
     })
-    const [passwordAgainErr, setPasswordAgainErr] = useState<SignError>({
+    const [passwordAgainErr, setPasswordAgainErr] = useState<FetchError>({
         isErr: false,
         message: ''
     })

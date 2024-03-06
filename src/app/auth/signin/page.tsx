@@ -5,7 +5,7 @@ import {Card, CardActions, CardContent, Container, Stack, TextField} from "@mui/
 import Typography from "@mui/material/Typography";
 import theme from "@/components/ThemeRegistry/theme";
 import Button from "@mui/material/Button";
-import {LogInUserData, SignError} from "@/utils/interfaces";
+import {LogInUserData, FetchError} from "@/utils/interfaces";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {useRouter} from "next/navigation";
 import axios from "axios";
@@ -14,11 +14,11 @@ export default function SignIn() {
     const usernameRef = useRef('')
     const passwordRef = useRef('')
 
-    const [usernameErr, setUsernameErr] = useState<SignError>({
+    const [usernameErr, setUsernameErr] = useState<FetchError>({
         isErr: false,
         message: ''
     })
-    const [passwordErr, setPasswordErr] = useState<SignError>({
+    const [passwordErr, setPasswordErr] = useState<FetchError>({
         isErr: false,
         message: ''
     })

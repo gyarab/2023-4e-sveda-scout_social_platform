@@ -7,10 +7,6 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 
 export default function MultiActionAreaCard() {
-
-
-
-
     return (
         <Box
             sx={{
