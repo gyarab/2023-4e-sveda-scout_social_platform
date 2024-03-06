@@ -10,6 +10,7 @@ const tokenScheme: ZodString = z.string().length(36)
 export async function GET() {
     const client: PoolClient = await pool.connect()
     try {
+        console.log('/api/auth/signout')
         const tokenReq = cookies().get('token')
 
         const token: SafeParseReturnType<boolean, string> = tokenScheme.safeParse(tokenReq?.value)

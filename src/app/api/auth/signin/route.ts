@@ -11,9 +11,7 @@ const passwordScheme: ZodString = z.string().min(1).max(40)
 export async function POST(req: NextRequest, res: NextResponse) {
     const client: PoolClient = await pool.connect()
     try {
-
-        console.log(getTimeMs())
-
+        console.log('/api/auth/signin')
         let userData: LogInUserData = await req.json()
 
         const username: SafeParseReturnType<boolean, string> = usernameScheme.safeParse(userData.username)
