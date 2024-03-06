@@ -6,7 +6,7 @@ export interface SignUpUserData {
     passwordAgain: string
 }
 
-export interface SignError {
+export interface FetchError {
     isErr: boolean,
     message: string
 }
@@ -26,5 +26,12 @@ export interface ChatListItemProps {
     },
     badge: {
         color: string,
-    }
+    },
+    click?: () => void
+}
+
+export interface CreateNewChatData {
+    name?: string,
+    type: string,
+    members: string[],
 }
