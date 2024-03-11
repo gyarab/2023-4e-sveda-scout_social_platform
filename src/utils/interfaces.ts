@@ -35,3 +35,32 @@ export interface CreateNewChatData {
     type: string,
     members: string[],
 }
+
+export interface IMsgDataTypes {
+    roomId: string | number;
+    username: string;
+    message: string;
+    time: string;
+}
+
+export interface User {
+    username: string,
+    nickname: string,
+    email: string
+}
+
+export interface ResponsiveBarProps {
+    username: string
+}
+
+export interface PostMessageData {
+    roomId: string,
+    message: string,
+    time: string
+}
+
+export interface GetMessageData {
+    roomId: string,
+    time: string,
+    lastMessageTime: string
+}

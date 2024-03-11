@@ -1,5 +1,10 @@
 import sha512 from "crypto-js/sha512";
 
+export const directColor: string = '#2196F3'
+export const troopColor: string = '#009688'
+export const groupColor: string = '#B26A00'
+export const districtColor: string = '#E91E63'
+
 export const getTimeMs = (): number => {
     return Date.now();
 }
@@ -20,3 +25,5 @@ export const hashPassword = (password: string, salt: string=''): string => {
 
     return sha512(salt + password).toString()
 }
+
+export const createRoomId = (toBeHashed: string): string => sha512(toBeHashed).toString()
