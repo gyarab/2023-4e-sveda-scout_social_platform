@@ -1,12 +1,43 @@
 'use client'
 import {Card, CardActions, CardContent, Container, Stack,} from "@mui/material";
 import ResponsiveAppBar from "@/components/AppBar/ResponsiveAppBar";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
+import axios from "axios";
+import {User} from "@/utils/interfaces";
+import {useRouter} from "next/navigation";
 
 export default function MultiActionAreaCard() {
+    const [user, setUser] = useState<User>({
+        username: '',
+        nickname: '',
+        email: '',
+    })
+
+    const router = useRouter()
+
+    const auth = async () => {
+        const res = await axios.get('/api/auth/auth')
+        return res.data
+    }
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const data = await auth()
+            setUser(data)
+        }
+
+        checkAuth().catch((err) => {
+            if (err.response.status === 401)
+                router.push('/auth/signin')
+        })
+    }, []);
+
+    console.log(user)
+
+
     return (
         <Box
             sx={{
@@ -18,7 +49,9 @@ export default function MultiActionAreaCard() {
                 justifyContent: 'space-evenly'
             }}
         >
-            <ResponsiveAppBar/>
+            <ResponsiveAppBar
+                username={user.username}
+            />
             <Container sx={{height: '100%', display: 'flex', marginTop: '100px', marginBottom: '50px'}}>
                 <Stack
                     direction={'column'}
