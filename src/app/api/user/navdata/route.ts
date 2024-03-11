@@ -4,6 +4,7 @@ import pool from '../../../../database/db'
 import {PoolClient, QueryResult} from "pg";
 import {getExpirationTime, getTimeMs} from "@/utils/utils";
 import { cookies } from 'next/headers'
+import {auth} from "@/database/authentication";
 
 const tokenScheme: ZodString = z.string().length(36)
 
@@ -27,12 +28,7 @@ export async function GET() {
 
         await client.query('BEGIN')
 
-        // check whether the session exists or not
-        const existenceQuery: string = 'select count(token) from sessions where token=$1 and expires_on>$2'
-        const existenceResult: QueryResult = await client.query(existenceQuery, [token.data, getTimeMs()]);
-
-        if (Number.parseInt(existenceResult.rows[0].count) < 1) {
-            console.log('here')
+        if (!await auth(client, token.data)) {
             await client.query('ROLLBACK')
             client.release()
             return Response.json({
@@ -43,10 +39,6 @@ export async function GET() {
                 status: 401
             })
         }
-
-        // revalidate session
-        const revalidateQuery: string = 'update sessions set expires_on=$1 where token=$2 and expires_on>$3'
-        await client.query(revalidateQuery, [getExpirationTime(), token.data, getTimeMs()])
 
         // get username
         const navDataQuery: string = 'select username from users inner join sessions on users.id = user_id where token=$1 and expires_on>$2'
