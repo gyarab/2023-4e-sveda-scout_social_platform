@@ -188,7 +188,8 @@ create table if not exists message_groups
     id              bigserial primary key,
     name            varchar not null,
     type            varchar not null,
-    edited_on      bigint  not null
+    edited_on       bigint  not null,
+    room_id         varchar not null
 );
 
 create table if not exists message_group_members
