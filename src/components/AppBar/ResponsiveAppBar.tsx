@@ -19,6 +19,7 @@ import Link from "next/link";
 import axios from "axios";
 import {useRouter} from "next/navigation";
 import theme from "@/components/ThemeRegistry/theme";
+import {ResponsiveBarProps} from "@/utils/interfaces";
 
 const pages = [
     {
@@ -38,7 +39,7 @@ const pages = [
     }
 ];
 
-function ResponsiveAppBar() {
+function ResponsiveAppBar(props: ResponsiveBarProps) {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -177,8 +178,7 @@ function ResponsiveAppBar() {
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
                                 <Avatar
-                                    alt={'User'}
-                                    src="/static/images/avatar/2.jpg"
+                                    alt={props.username}
                                     sx={{
                                         backgroundColor: theme.palette.secondary.light
                                     }}
