@@ -3,8 +3,9 @@ import {CreateNewChatData, LogInUserData} from "@/utils/interfaces";
 import {boolean, SafeParseReturnType, z, ZodArray, ZodString} from 'zod'
 import pool from '../../../../database/db'
 import {PoolClient, QueryResult} from "pg";
-import {getExpirationTime, getTimeMs, hashPassword} from "@/utils/utils";
+import {createRoomId, getExpirationTime, getTimeMs, hashPassword} from "@/utils/utils";
 import {cookies} from "next/headers";
+import {auth} from "@/database/authentication";
 
 const tokenScheme: ZodString = z.string().length(36)
 const nameScheme: ZodString = z.string().min(1).max(20)
@@ -90,11 +91,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         await client.query('BEGIN')
 
-        // check whether the session exists or not
-        const existenceQuery: string = 'select count(token) from sessions where token=$1 and expires_on>$2'
-        const existenceResult: QueryResult = await client.query(existenceQuery, [token.data, getTimeMs()]);
-
-        if (Number.parseInt(existenceResult.rows[0].count) < 1) {
+        if (!await auth(client, token.data)) {
             await client.query('ROLLBACK')
             client.release()
             return Response.json({
@@ -105,11 +102,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 status: 401
             })
         }
-
-        // revalidate session
-        const revalidateQuery: string = 'update sessions set expires_on=$1 where token=$2 and expires_on>$3'
-        console.log(getExpirationTime(), token.data, getTimeMs())
-        await client.query(revalidateQuery, [getExpirationTime(), token.data, getTimeMs()])
 
         // check whether members exist
         for (let i = 0; i < userData.members.length; i++) {
@@ -196,9 +188,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
         }
 
         // create message group
-        const messageGroupQuery: string = 'insert into message_groups values (DEFAULT, $1, $2, $3)'
-
-        await client.query(messageGroupQuery, [userData.name, userData.type, getTimeMs()])
+        const messageGroupQuery: string = 'insert into message_groups values (DEFAULT, $1, $2, $3, $4)'
+        const created_on: number = getTimeMs();
+        const room_id: string = createRoomId(created_on.toString());
+        await client.query(messageGroupQuery, [userData.name, userData.type, created_on, room_id])
         console.log('create message group')
 
         // get message group id
