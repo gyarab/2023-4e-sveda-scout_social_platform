@@ -5,6 +5,7 @@ import pool from '../../../../database/db'
 import {PoolClient, QueryResult} from "pg";
 import {getExpirationTime, getTimeMs, hashPassword} from "@/utils/utils";
 import {cookies} from "next/headers";
+import {auth} from "@/database/authentication";
 
 const tokenScheme: ZodString = z.string().length(36)
 const nameScheme: ZodString = z.string().min(1).max(20)
@@ -33,12 +34,7 @@ export async function GET() {
 
         await client.query('BEGIN')
 
-        // check whether the session exists or not
-        const existenceQuery: string = 'select count(token) from sessions where token=$1 and expires_on>$2'
-        const existenceResult: QueryResult = await client.query(existenceQuery, [token.data, getTimeMs()]);
-
-        if (Number.parseInt(existenceResult.rows[0].count) < 1) {
-            console.log('here')
+        if (!await auth(client, token.data)) {
             await client.query('ROLLBACK')
             client.release()
             return Response.json({
@@ -50,18 +46,13 @@ export async function GET() {
             })
         }
 
-        // revalidate session
-        const revalidateQuery: string = 'update sessions set expires_on=$1 where token=$2 and expires_on>$3'
-        await client.query(revalidateQuery, [getExpirationTime(), token.data, getTimeMs()])
-        console.log('revalidate session')
-
         // get username
         const usernameQuery: string = 'select username from users inner join sessions on users.id = user_id where token=$1 and expires_on>$2'
         const usernameResult: QueryResult = await client.query(usernameQuery, [token.data, getTimeMs()])
         const username = usernameResult.rows[0].username
 
         // get direct list
-        const getListQuery: string = 'select mg.id, type, name from message_groups as mg inner join message_group_members on mg.id = message_group_id where type = $1 and user_id = (select u.id from users as u inner join sessions as s on u.id = s.user_id where token = $2) order by edited_on'
+        const getListQuery: string = 'select mg.id, type, name, room_id from message_groups as mg inner join message_group_members on mg.id = message_group_id where type = $1 and user_id = (select u.id from users as u inner join sessions as s on u.id = s.user_id where token = $2) order by edited_on'
         const getDirectListResult: QueryResult = await client.query(getListQuery, ['direct', token.data])
         const directs: any[] = getDirectListResult.rows
 
