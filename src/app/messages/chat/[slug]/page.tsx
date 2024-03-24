@@ -281,7 +281,8 @@ export default function Chat({params}: { params: { slug: string } }) {
                                                 <FormHelperText
                                                     sx={{
                                                         marginBottom: '5px',
-                                                        marginLeft: !itIsMe ? '20px' : '0px'
+                                                        marginLeft: !itIsMe ? '12px' : '0px',
+                                                        color: theme.palette.primary.dark
                                                     }}
                                                 >
                                                     {label}
