@@ -11,6 +11,7 @@ export default function ChatListItem(props: ChatListItemProps) {
         <Badge
             badgeContent=" "
             sx={{
+                width: '100%',
                 transform: 'translate(-2px, 10px)',
                 "& .MuiBadge-badge": {
                     backgroundColor: props.badge.color,
@@ -18,12 +19,10 @@ export default function ChatListItem(props: ChatListItemProps) {
                 },
             }}
         >
-            {
-                // remove upper case on buttons
-            }
             <Button
                 variant={'text'}
                 onClick={props.click}
+                fullWidth
                 sx={{
                     transform: 'translate(2px, -10px)',
                     padding: 0,
@@ -57,15 +56,15 @@ export default function ChatListItem(props: ChatListItemProps) {
                         primary={props.text.primary}
                         secondary={
                             <React.Fragment>
+                                {`Last interaction - `}
                                 <Typography
                                     sx={{display: 'inline'}}
                                     component="span"
                                     variant="body2"
                                     color="text.primary"
                                 >
-                                    Ali Connors
+                                    {props.text.edited_on}
                                 </Typography>
-                                {" — I'll be in your neighborhood doing errands this…"}
                             </React.Fragment>
                         }
                     />
