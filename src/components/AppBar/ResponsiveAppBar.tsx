@@ -27,13 +27,10 @@ const pages = [
         href: '/'
     },
     {
-        name: 'Feed',
-        href: '/feed'
-    },
-    {
         name: 'Messages',
         href: '/messages'
-    }, {
+    },
+    {
         name: 'Plans',
         href: '/plans'
     }
