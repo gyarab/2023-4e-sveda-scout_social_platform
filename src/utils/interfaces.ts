@@ -23,6 +23,7 @@ export interface ChatListItemProps {
     },
     text: {
         primary: string,
+        edited_on?: string
     },
     badge: {
         color: string,
@@ -36,11 +37,17 @@ export interface CreateNewChatData {
     members: string[],
 }
 
-export interface IMsgDataTypes {
-    roomId: string | number;
+export interface MessageData {
+    roomId: string;
     username: string;
     message: string;
     time: string;
+}
+
+export interface ImageData {
+    name: string,
+    type: string,
+    posted_on: string,
 }
 
 export interface User {
