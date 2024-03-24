@@ -321,6 +321,9 @@ export default function Chat({params}: { params: { slug: string } }) {
                                                 },
                                                 '.mui-k4qjio-MuiFormHelperText-root.Mui-disabled': {
                                                     WebkitTextFillColor: theme.palette.primary.dark
+                                                },
+                                                '.mui-1d3z3hw-MuiOutlinedInput-notchedOutline': {
+                                                    border: 'none'
                                                 }
                                             }}
                                         />
