@@ -70,71 +70,6 @@ create table if not exists sessions
     user_id    bigint not null references users
 );
 
-
--- POSTS
--- add photo/video representation
-create table if not exists posts
-(
-    id          bigserial primary key,
-    description varchar,
-    place       varchar,
-    user_id     bigint    not null references users,
-    created_on  timestamp not null default current_timestamp
-);
-
--- (rating == true)  -> like
--- (rating == false) -> dislike
-create table if not exists ratings
-(
-    id      bigserial primary key,
-    rating  boolean not null default true,
-    user_id bigint  not null references users,
-    post_id bigint  not null references posts
-);
-
-create table if not exists comments
-(
-    id         bigserial primary key,
-    text       varchar   not null,
-    created_by bigint    not null references users,
-    created_on timestamp not null default current_timestamp,
-    post_id    bigint    not null references posts
-);
-
--- (rating == true)  -> like
--- (rating == false) -> dislike
-create table if not exists comment_ratings
-(
-    id         bigserial primary key,
-    rating     boolean not null default true,
-    comment_id bigint  not null references comments
-);
-
-create table if not exists videos
-(
-    id   bigserial primary key,
-    path varchar not null
-);
-
-create table if not exists photos
-(
-    id   bigserial primary key,
-    path varchar not null
-);
-
-create table if not exists post_video
-(
-    post_id  bigint not null references posts,
-    video_id bigint not null references videos
-);
-
-create table if not exists post_photo
-(
-    post_id  bigint not null references posts,
-    photo_id bigint not null references photos
-);
-
-
 -- EVENT PLANNING
 create table if not exists plans
 (
@@ -209,6 +144,56 @@ create table if not exists messages
     user_id          bigint  not null references users,
     message_group_id bigint  not null references message_groups
 );
+
+-- POSTS
+-- add photo/video representation
+create table if not exists posts
+(
+    id          bigserial primary key,
+    description varchar,
+    place       varchar,
+    user_id     bigint    not null references users,
+    created_on  timestamp not null default current_timestamp
+);
+
+-- (rating == true)  -> like
+-- (rating == false) -> dislike
+create table if not exists ratings
+(
+    id      bigserial primary key,
+    rating  boolean not null default true,
+    user_id bigint  not null references users,
+    post_id bigint  not null references posts
+);
+
+create table if not exists comments
+(
+    id         bigserial primary key,
+    text       varchar   not null,
+    created_by bigint    not null references users,
+    created_on timestamp not null default current_timestamp,
+    post_id    bigint    not null references posts
+);
+
+-- (rating == true)  -> like
+-- (rating == false) -> dislike
+create table if not exists comment_ratings
+(
+    id         bigserial primary key,
+    rating     boolean not null default true,
+    comment_id bigint  not null references comments
+);
+
+create table if not exists media
+(
+    id   bigserial primary key,
+    path varchar not null,
+    type varchar not null,
+    posted_on bigint not null,
+    user_id bigint not null,
+    message_group_id bigint not null references message_groups
+);
+
 
 -- CREATING FEED
 -- 1st layer - posts from people the user follows
