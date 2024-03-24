@@ -27,3 +27,9 @@ export const hashPassword = (password: string, salt: string=''): string => {
 }
 
 export const createRoomId = (toBeHashed: string): string => sha512(toBeHashed).toString()
+
+export const getFullDate = (time: string): string => {
+    const date: Date = new Date(Number.parseInt(time))
+    const minutes: number = date.getMinutes()
+    return  date.getDate() + '. ' + date.getMonth() + '. ' + date.getFullYear() + ' ' + date.getHours() + ":" + `${minutes < 10 ? '0' : ''}${minutes}`
+}
