@@ -17,3 +17,10 @@ export async function auth(client: PoolClient, token: string) {
 
     return true;
 }
+
+export async function checkRightsForChat(client: PoolClient, roomId: string, token: string) {
+    const chatAvailabilityQuery: string = 'select count(u.id) from users as u inner join message_group_members as mgm on u.id = mgm.user_id inner join message_groups as mg on mg.id = message_group_id inner join sessions as s on u.id = s.user_id where message_group_id = (select id from message_groups where room_id = $1) and token = $2'
+    const chatAvailabilityResult: QueryResult = await client.query(chatAvailabilityQuery, [roomId, token])
+    console.log('check rights to access the chat')
+    return chatAvailabilityResult.rows[0].count;
+}
