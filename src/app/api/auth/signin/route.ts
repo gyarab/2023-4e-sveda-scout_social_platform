@@ -115,6 +115,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
             headers: {'Set-Cookie': `token=${token};path=/`}
         })
     } catch (e) {
+        console.log(e)
         await client.query('ROLLBACK')
         return new Response('Internal server error', {
             status: 500,

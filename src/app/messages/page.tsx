@@ -35,7 +35,8 @@ import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import axios from "axios";
 import {useRouter} from "next/navigation";
-import {directColor, districtColor, groupColor, troopColor} from "@/utils/utils";
+import {directColor, districtColor, getFullDate, groupColor, troopColor} from "@/utils/utils";
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 
 export default function MessagesMenu() {
     const chatNameRef = useRef(null);
@@ -111,13 +112,15 @@ export default function MessagesMenu() {
                         else if (item.type === 'district')
                             color = districtColor
 
+
                         const props: ChatListItemProps = {
                             avatar: {
                                 username: 'Travis Howard',
                                 image: '/static/images/avatar/2.jpg'
                             },
                             text: {
-                                primary: item.name
+                                primary: item.name,
+                                edited_on: getFullDate(item.edited_on)
                             },
                             badge: {
                                 color: color
@@ -383,8 +386,8 @@ export default function MessagesMenu() {
                     }}
                 >
                     <BottomNavigationAction
-                        label="Recents"
-                        icon={<ScheduleOutlinedIcon/>}
+                        label="Directs"
+                        icon={<PersonOutlineIcon/>}
                         sx={{
                             backgroundColor: directColor,
                         }}

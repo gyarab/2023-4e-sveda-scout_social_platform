@@ -52,20 +52,22 @@ export async function GET() {
         const username = usernameResult.rows[0].username
 
         // get direct list
-        const getListQuery: string = 'select mg.id, type, name, room_id from message_groups as mg inner join message_group_members on mg.id = message_group_id where type = $1 and user_id = (select u.id from users as u inner join sessions as s on u.id = s.user_id where token = $2) order by edited_on'
-        const getDirectListResult: QueryResult = await client.query(getListQuery, ['direct', token.data])
+        const getListQuery: string = 'select mg.id, type, name, room_id, edited_on from message_groups as mg inner join message_group_members as mgm on mg.id = mgm.message_group_id where type = $1 and mgm.user_id = (select u.id from users as u inner join sessions as s on u.id = s.user_id where token = $2 and expires_on>$3) group by edited_on, mg.id'
+        const getDirectListResult: QueryResult = await client.query(getListQuery, ['direct', token.data, getTimeMs()])
         const directs: any[] = getDirectListResult.rows
+        console.log(directs)
 
         // get troop list
-        const getTroopListResult: QueryResult = await client.query(getListQuery, ['troop', token.data])
+        const getTroopListResult: QueryResult = await client.query(getListQuery, ['troop', token.data, getTimeMs()])
         const troops: any[] = getTroopListResult.rows
+        console.log(troops)
 
         // get group list
-        const getGroupListResult: QueryResult = await client.query(getListQuery, ['group', token.data])
+        const getGroupListResult: QueryResult = await client.query(getListQuery, ['group', token.data, getTimeMs()])
         const groups: any[] = getGroupListResult.rows
 
         // get district list
-        const getDistrictListResult: QueryResult = await client.query(getListQuery, ['district', token.data])
+        const getDistrictListResult: QueryResult = await client.query(getListQuery, ['district', token.data, getTimeMs()])
         const districts: any[] = getDistrictListResult.rows
 
         await client.query('COMMIT')
@@ -77,10 +79,10 @@ export async function GET() {
         }
 
         return Response.json({
-            directs: directs,
-            troops: troops,
-            groups: groups,
-            districts: districts,
+            directs: directs.reverse(),
+            troops: troops.reverse(),
+            groups: groups.reverse(),
+            districts: districts.reverse(),
         }, {
             status: 200,
         })

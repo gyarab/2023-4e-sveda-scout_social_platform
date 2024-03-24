@@ -2,21 +2,24 @@
 import ResponsiveAppBar from "@/components/AppBar/ResponsiveAppBar";
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import Box from "@mui/material/Box";
-import {CircularProgress, Container, Paper, Stack, TextField} from "@mui/material";
+import {CircularProgress, Container, FormHelperText, Paper, Stack, TextField} from "@mui/material";
 import theme from "@/components/ThemeRegistry/theme";
 import Button from "@mui/material/Button";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import axios from "axios";
 import {io} from "socket.io-client";
-import {GetMessageData, IMsgDataTypes, PostMessageData, User} from "@/utils/interfaces";
-import {districtColor, getTimeMs} from "@/utils/utils";
+import {GetMessageData, MessageData, PostMessageData, User} from "@/utils/interfaces";
+import {districtColor, getFullDate, getTimeMs} from "@/utils/utils";
 import {useRouter} from "next/navigation";
+import Image from 'next/image'
+
+const prefix: string = 'http://localhost'
 
 export default function Chat({params}: { params: { slug: string } }) {
 
     const messagesEndRef = useRef()
-    const [chat, setChat] = useState<IMsgDataTypes[]>([])
+    const [chat, setChat] = useState<any[]>([])
     const [messageInput, setMessageInput] = useState<string>('')
 
     const roomId: string = useMemo(() => params.slug, [params])
@@ -33,7 +36,7 @@ export default function Chat({params}: { params: { slug: string } }) {
     const router = useRouter()
 
     var socket: any;
-    socket = io("http://localhost:3001");
+    socket = io(`${prefix}:3001`);
 
     const handleJoin = (username: string) => {
         if (username !== "" && roomId.length > 0) {
@@ -46,10 +49,9 @@ export default function Chat({params}: { params: { slug: string } }) {
 
     const sendData = async (e: any) => {
         const message: string = messageInput;
-        console.log('here', message)
 
         if (message !== undefined && message.length > 0 && message.length <= 500) {
-            const messageData: IMsgDataTypes = {
+            const messageData: MessageData = {
                 roomId,
                 username: user.username,
                 message: message,
@@ -77,11 +79,11 @@ export default function Chat({params}: { params: { slug: string } }) {
     }
 
     useEffect(() => {
-        const checkAuth = async () => {
+        const readInitalData = async () => {
             const data = await auth()
             setUser(data)
             try {
-                const res = await getMessages()
+                const res = await getChat((chat.length > 0) ? chat[0].time : getTimeMs().toString())
                 setChat([...res])
             } catch (err) {
                 console.log(err)
@@ -92,29 +94,36 @@ export default function Chat({params}: { params: { slug: string } }) {
             }, 1500)
         }
 
-        checkAuth().catch((err) => {
+        readInitalData().catch((err) => {
             if (err.response.status === 401)
                 router.push('/auth/signin')
         })
     }, []);
 
     useEffect(() => {
-        socket.on("receive_message", (data: IMsgDataTypes) => {
+        socket.on("receive_message", (data: any) => {
             console.log('received message')
-            setChat((pre: IMsgDataTypes[]) => {
+            setChat((pre) => {
                 if (pre.length == 0 || pre[pre.length - 1].time !== data.time)
                     return [...pre, data]
 
                 return [...pre]
             });
         });
+        socket.on("receive_image", async (data: any) => {
+            console.log('received image')
+            console.log((chat.length > 0) ? chat[chat.length - 1].time : getTimeMs().toString())
+            const res = await getChat(getTimeMs().toString())
+            console.log(res)
+            setChat(res)
+        });
     }, [socket]);
 
-    const getMessages = async () => {
+    const getChat = async (lastMessageTime: string) => {
         const getObject: GetMessageData = {
             roomId,
             time: getTimeMs().toString(),
-            lastMessageTime: (chat.length > 0) ? chat[0].time : getTimeMs().toString()
+            lastMessageTime: lastMessageTime
         }
 
         const res = await axios.post('/api/messages/get', getObject)
@@ -136,15 +145,31 @@ export default function Chat({params}: { params: { slug: string } }) {
         fileInputRef?.current?.click();
     }
 
-    const handleFileInput = (e: any) => {
+    const handleFileInput = async (e: any) => {
         const files = e.target.files
         console.log(files)
+
+        const fd: FormData = new FormData()
+
+        for (let i: number = 0; i < files.length; i++)
+            fd.append(files[i].name, files[i])
+
+        fd.append('room_id', roomId)
+
+        const res = await axios.post('/api/images/post', fd)
+        console.log(res)
+
+        await socket.emit("send_image", {
+            roomId,
+            count: files.length
+        });
+        console.log('send')
     }
 
     const updateChat = async (e: any) => {
         try {
-            const res = await getMessages()
-            setChat((pre: IMsgDataTypes[]) => {
+            const res = await getChat((chat.length > 0) ? chat[0].time : getTimeMs().toString())
+            setChat((pre: MessageData[]) => {
                 return [...res.concat(pre)]
             })
         } catch (err) {
@@ -214,11 +239,57 @@ export default function Chat({params}: { params: { slug: string } }) {
                             />
                         }
                         {
-                            chat.map((message: IMsgDataTypes, index: number) => {
-                                const date: Date = new Date(Number.parseInt(message.time))
-                                const messTime: string = date.getHours() + ":" + date.getMinutes()
-                                const itIsMe: boolean = user.username === message.username
-                                const label = (!itIsMe ? `${message.username} - ` : '') + messTime
+                            chat.map((item, index: number) => {
+                                const itIsMe: boolean = user.username === item.username
+                                const label: string = (!itIsMe ? `${item.username} - ` : '') + getFullDate(item.time)
+
+                                if (item.path !== undefined) {
+                                    return (
+                                        <Stack
+                                            key={index}
+                                            sx={{
+                                                width: '100%',
+                                            }}
+                                            direction={'column'}
+                                            alignItems={itIsMe ? 'flex-end' : 'flex-start'}
+                                            justifyContent={'center'}
+                                        >
+                                            <Image
+                                                src={`${prefix}:3000/api/images/get/${item.path.split('/').pop()}`}
+                                                height={400}
+                                                width={400}
+                                                alt={"Picture of the author"}
+                                                style={{
+                                                    width: '95%',
+                                                    height: 'auto',
+                                                    borderRadius: '12px',
+                                                    border: `${itIsMe ? districtColor : theme.palette.primary.main} 2px solid`,
+                                                    marginBottom: '5px',
+                                                    marginTop: '10px'
+                                                }}
+                                                quality={100}
+                                            />
+                                            <Stack
+                                                key={index}
+                                                sx={{
+                                                    width: '90%',
+                                                }}
+                                                direction={'row'}
+                                                alignItems={'center'}
+                                                justifyContent={'flex-start'}
+                                            >
+                                                <FormHelperText
+                                                    sx={{
+                                                        marginBottom: '5px',
+                                                        marginLeft: !itIsMe ? '20px' : '0px'
+                                                    }}
+                                                >
+                                                    {label}
+                                                </FormHelperText>
+                                            </Stack>
+                                        </Stack>
+                                    )
+                                }
 
                                 return (
                                     <Stack
@@ -235,7 +306,7 @@ export default function Chat({params}: { params: { slug: string } }) {
                                             size={'small'}
                                             margin={'dense'}
                                             helperText={label}
-                                            value={message.message}
+                                            value={item.message}
                                             multiline
                                             disabled
                                             sx={{
@@ -245,7 +316,7 @@ export default function Chat({params}: { params: { slug: string } }) {
                                                     WebkitTextFillColor: theme.palette.primary.dark,
                                                 },
                                                 '.mui-15jix3j-MuiInputBase-root-MuiOutlinedInput-root': {
-                                                    border: `${itIsMe ? districtColor : theme.palette.primary.main} 2px solid !important`,
+                                                    border: `${itIsMe ? districtColor : theme.palette.primary.main} 2px solid`,
                                                     borderRadius: 1,
                                                 },
                                                 '.mui-k4qjio-MuiFormHelperText-root.Mui-disabled': {
@@ -295,7 +366,14 @@ export default function Chat({params}: { params: { slug: string } }) {
                         }}
                         onClick={handleFileInputTrigger}
                     >
-                        <input type="file" ref={fileInputRef} style={{display: 'none'}} onChange={handleFileInput}/>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{display: 'none'}}
+                            onChange={handleFileInput}
+                            multiple={true}
+                            accept={"image/*"}
+                        />
                         <CameraAltOutlinedIcon
                             sx={{
                                 fontSize: '25px',

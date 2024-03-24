@@ -21,9 +21,15 @@ io.on("connection", (socket) => {
     });
 
     socket.on("send_message", (data) => {
-        console.log(data, "DATA");
+        console.log(data, "msg_DATA");
         //This will send a message to a specific room ID
         socket.to(data.roomId).emit("receive_message", data);
+    });
+
+    socket.on("send_image", (data) => {
+        console.log(data, "img_DATA");
+        //This will send a message to a specific room ID
+        socket.to(data.roomId).emit("receive_image", data);
     });
 
     socket.on("disconnect", () => {
