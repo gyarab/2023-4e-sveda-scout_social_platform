@@ -21,6 +21,7 @@ export default function Chat({params}: { params: { slug: string } }) {
     const messagesEndRef = useRef()
     const [chat, setChat] = useState<any[]>([])
     const [messageInput, setMessageInput] = useState<string>('')
+    const [loadingMessages, setLoadingMessages] = useState<boolean>(true)
 
     const roomId: string = useMemo(() => params.slug, [params])
 
@@ -88,6 +89,7 @@ export default function Chat({params}: { params: { slug: string } }) {
             } catch (err) {
                 console.log(err)
             }
+            setLoadingMessages(false)
             handleJoin(data.username)
             setTimeout(() => {
                 scrollToBottom()
@@ -112,10 +114,12 @@ export default function Chat({params}: { params: { slug: string } }) {
         });
         socket.on("receive_image", async (data: any) => {
             console.log('received image')
+            setLoadingMessages(true)
             console.log((chat.length > 0) ? chat[chat.length - 1].time : getTimeMs().toString())
             const res = await getChat(getTimeMs().toString())
             console.log(res)
             setChat(res)
+            setLoadingMessages(false)
         });
     }, [socket]);
 
@@ -231,7 +235,7 @@ export default function Chat({params}: { params: { slug: string } }) {
                             Read more
                         </Button>
                         {
-                            chat.length < 1 &&
+                            loadingMessages &&
                             <CircularProgress
                                 sx={{
                                     color: theme.palette.primary.main,
