@@ -71,3 +71,11 @@ export interface GetMessageData {
     time: string,
     lastMessageTime: string
 }
+
+export interface EventData {
+    eventname: string,
+    description: string,
+    participants: string[],
+    voteEndingTime: number,
+    voteOptions: number[]
+}

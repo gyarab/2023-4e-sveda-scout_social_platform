@@ -33,3 +33,5 @@ export const getFullDate = (time: string): string => {
     const minutes: number = date.getMinutes()
     return  date.getDate() + '. ' + date.getMonth() + '. ' + date.getFullYear() + ' ' + date.getHours() + ":" + `${minutes < 10 ? '0' : ''}${minutes}`
 }
+
+export const getTimeMillisecondsFromDate = (date: Date) => ((date.getHours() * 60 + date.getMinutes()) * 60 + date.getSeconds()) * 1000 + date.getMilliseconds()
