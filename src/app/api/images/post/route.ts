@@ -108,6 +108,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
             // @ts-ignore
             await client.query(postImageQuery, [relativeMediaPath, file.type, currentTime, token.data, currentTime, roomId.data])
 
+            // update edited_on in message group
+            const updateEditTimeQuery: string = 'update message_groups set edited_on = $1 where room_id = $2'
+            await client.query(updateEditTimeQuery, [currentTime, roomId.data])
+
             try {
                 // @ts-ignore
                 const buffer: Buffer = Buffer.from(await file.arrayBuffer());

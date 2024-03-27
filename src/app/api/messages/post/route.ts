@@ -104,6 +104,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const postMessageQuery: string = 'insert into messages values (DEFAULT, $1, $2, (select u.id from users as u inner join sessions as s on u.id = user_id where token=$3 and expires_on>$2), (select id from message_groups where room_id = $4))'
         await client.query(postMessageQuery, [message.data, time.data, token.data, roomId.data])
 
+        // update edited_on in message group
+        const updateEditTimeQuery: string = 'update message_groups set edited_on = $1 where room_id = $2'
+        await client.query(updateEditTimeQuery, [time.data, roomId.data])
+
         await client.query('COMMIT')
         client.release()
 
