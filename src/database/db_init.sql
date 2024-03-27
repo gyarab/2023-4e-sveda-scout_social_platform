@@ -71,60 +71,75 @@ create table if not exists sessions
 );
 
 -- EVENT PLANNING
-create table if not exists plans
-(
-    id   bigserial primary key,
-    name varchar not null
-);
-
-create table if not exists plan_invitations
-(
-    id      bigserial primary key,
-    user_id bigint not null references users,
-    plan_id bigint not null references plans
-);
-
-create table if not exists term_options
-(
-    id      bigserial primary key,
-    date    timestamp not null,
-    plan_id bigint    not null references plans
-);
-
--- (attend == null)  -> maybe
--- (attend == true)  -> yes
--- (attend == false) -> no
-create table if not exists term_option_votes
-(
-    id             bigserial primary key,
-    attend         boolean default null,
-    user_id        bigint not null references users,
-    term_option_id bigint not null references term_options
-);
-
 create table if not exists events
 (
     id   bigserial primary key,
-    name varchar   not null,
-    date timestamp not null
+    name varchar not null,
+    description varchar,
+    decision_date bigint not null,
+    date bigint default null -- if null => event is still not closed
 );
 
 create table if not exists event_participants
 (
     id       bigserial primary key,
-    attend   boolean default null,
     user_id  bigint not null references users,
     event_id bigint not null references events
 );
 
+create table if not exists event_terms
+(
+    id       bigserial primary key,
+    date     bigint not null,
+    event_id bigint not null references events
+);
+
+create table if not exists event_term_votes
+(
+    id      bigserial primary key,
+    vote    integer not null, -- 1 = want to attend; 2 = don't want to attend; 3 = if needed
+    user_id bigint  not null references users,
+    term_id bigint  not null references event_terms
+);
+
+create table if not exists event_admins
+(
+    id       bigserial primary key,
+    user_id bigint not null references users,
+    event_id bigint not null references events
+);
+
+/*
+LIST EVENTŮ
+- název eventu
+- kdy se koná
+
+TVORBA EVENTŮ
+- název eventu
+- popis eventu
+- kdo je zván
+- čas, do kdy se má zvolit
+- možnosti konání - datum + čas
+
+
+ROZKLIKNUTÍ EVENTU
+- název eventu
+- popis eventu
+- možnosti s počty voleb
+- kdo hlasoval a kdo nehlasoval
+- !! před načtením dat kontrola, zda hlasování neuzavřeno
+    - uzavřeno ==> název, popis, čas konání, kdo je zván
+
+ */
+
 --COMMUNICATION
 create table if not exists message_groups
 (
-    id              bigserial primary key,
-    name            varchar not null,
-    type            varchar not null,
-    edited_on       bigint  not null,
-    room_id         varchar not null
+    id        bigserial primary key,
+    name      varchar not null,
+    type      varchar not null,
+    edited_on bigint  not null,
+    room_id   varchar not null
 );
 
 create table if not exists message_group_members
@@ -186,12 +201,12 @@ create table if not exists comment_ratings
 
 create table if not exists media
 (
-    id   bigserial primary key,
-    path varchar not null,
-    type varchar not null,
-    posted_on bigint not null,
-    user_id bigint not null,
-    message_group_id bigint not null references message_groups
+    id               bigserial primary key,
+    path             varchar not null,
+    type             varchar not null,
+    posted_on        bigint  not null,
+    user_id          bigint  not null,
+    message_group_id bigint  not null references message_groups
 );
 
 
