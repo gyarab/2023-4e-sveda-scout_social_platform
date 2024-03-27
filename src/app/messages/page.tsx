@@ -11,7 +11,6 @@ import {
     Fab,
     FormHelperText,
     List,
-    ListSubheader,
     OutlinedInput,
     Paper,
     Select,
@@ -22,7 +21,6 @@ import {
 import ResponsiveAppBar from "@/components/AppBar/ResponsiveAppBar";
 import React, {useEffect, useRef, useState} from "react";
 import Box from "@mui/material/Box";
-import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
 import Diversity2OutlinedIcon from '@mui/icons-material/Diversity2Outlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
@@ -45,6 +43,7 @@ export default function MessagesMenu() {
     const [memberValues, setMemberValues] = useState<string[]>([])
     const [bottomMenuValue, setBottomMenuValue] = useState<number>(0);
     const [open, setOpen] = useState<boolean>(false);
+    const [usernames, setUsernames] = useState<string[]>([])
 
     const [directList, setDirectList] = useState([])
     const [troopList, setTroopList] = useState([])
@@ -64,18 +63,20 @@ export default function MessagesMenu() {
 
     const router = useRouter()
 
-    const getLists = async () => {
-        const res = await axios.get('/api/messages/chatlist')
-        return res.data
-    }
+    const getLists = async () => ((await axios.get('/api/messages/chatlist')).data)
+
+    const getUsernames = async () => ((await axios.get('/api/messages/usernames')).data)
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getLists()
-            setDirectList(data.directs)
-            setTroopList(data.troops)
-            setGroupList(data.groups)
-            setDistrictList(data.districts)
+            const listsFetch = await getLists()
+            setDirectList(listsFetch.directs)
+            setTroopList(listsFetch.troops)
+            setGroupList(listsFetch.groups)
+            setDistrictList(listsFetch.districts)
+
+            const usernamesFetch = await getUsernames()
+            setUsernames(usernamesFetch)
         }
 
         fetchData().catch((err) => {
@@ -305,14 +306,18 @@ export default function MessagesMenu() {
                             </Box>
                         )}
                     >
-                        <ListSubheader>District</ListSubheader>
-                        <MenuItem value={'Jakub'}>Option 1</MenuItem>
-                        <MenuItem value={'Jon'}>Option 2</MenuItem>
-                        <ListSubheader>Group</ListSubheader>
-                        <MenuItem value={'Hello'}>Option 3</MenuItem>
-                        <MenuItem value={'World'}>Option 4</MenuItem>
-                        <ListSubheader>Troop</ListSubheader>
-                        <ListSubheader>Others</ListSubheader>
+                        {
+                            usernames.map((username: string, index: number) => {
+                                return (
+                                    <MenuItem
+                                        key={index}
+                                        value={username}
+                                    >
+                                        {username}
+                                    </MenuItem>
+                                )
+                            })
+                        }
                     </Select>
                 </DialogContent>
                 <DialogActions
