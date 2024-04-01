@@ -1,21 +1,20 @@
-import {NextRequest, NextResponse} from "next/server";
-import {EventData} from "@/utils/interfaces";
+import {NextRequest} from "next/server";
+import {
+    descriptionScheme,
+    EventData,
+    nameScheme,
+    participantsScheme,
+    tokenScheme,
+    voteEndingTimeScheme, voteOptionsScheme
+} from "@/utils/interfaces";
 import {SafeParseReturnType, z, ZodArray, ZodNumber, ZodString} from 'zod'
 import pool from '../../../../database/db'
-import {PoolClient} from "pg";
+import {PoolClient, QueryResult} from "pg";
 import {cookies} from "next/headers";
 import {auth} from "@/database/authentication";
-import {getTimeMs} from "@/utils/utils";
+import {createEventId, getTimeMs} from "@/utils/utils";
 
-const tokenScheme: ZodString = z.string().length(36)
-const nameScheme: ZodString = z.string().min(1).max(50)
-const descriptionScheme: ZodString = z.string().max(1000)
-const participantsScheme: ZodArray<ZodString> = z.string().min(1).array().min(1)
-const voteEndingTimeScheme: ZodNumber = z.number().min(10000000)
-const voteOptionsScheme: ZodArray<ZodNumber> = z.number().min(10000000).array().min(1)
-
-
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
     const client: PoolClient = await pool.connect()
     try {
         console.log('/api/events/post')
@@ -137,9 +136,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
             })
         }
 
+        // get max id from events table
+        const getNewIdQuery: string = 'select max(id) from events'
+        const getNewIdResult: QueryResult = await client.query(getNewIdQuery)
+        let max: number = (getNewIdResult.rows[0].max === null) ? 1 : Number.parseInt(getNewIdResult.rows[0].max)
+        console.log('Got max id')
+
+        console.log(eventname.data, max)
+        const eventId: string = createEventId(eventname.data, max)
+        console.log(eventId)
+
         // post event
-        const postEventQuery: string = 'insert into events values (DEFAULT, $1, $2, $3, DEFAULT)'
-        await client.query(postEventQuery, [eventname.data, (description.data !== null && !description.data) ? description.data : null, voteEndingTime.data])
+        const postEventQuery: string = 'insert into events values (DEFAULT, $1, $2, $3, $4, DEFAULT)'
+        await client.query(postEventQuery, [eventId, eventname.data, (description.data !== null && description.data !== '' && description.data !== undefined) ? description.data : null, voteEndingTime.data])
+        console.log('Event posted')
 
         // add participants
         const addParticipantsQuery: string = 'insert into event_participants values (DEFAULT, (select id from users where username = $1), (select max(id) from events))'
@@ -149,15 +159,18 @@ export async function POST(req: NextRequest, res: NextResponse) {
         // add current user
         const addThisUserAsParticipantQuery: string = 'insert into event_participants values (DEFAULT, (select u.id from users as u inner join sessions as s on u.id = s.user_id where token = $1 and expires_on>$2), (select max(id) from events))'
         await client.query(addThisUserAsParticipantQuery, [token.data, getTimeMs()])
+        console.log('Added participants')
 
         // add vote options
         const voteOptionsQuery: string = 'insert into event_terms values (DEFAULT, $1, (select max(id) from events))'
         for (let i: number = 0; i < voteOptions.data.length; i++)
             await client.query(voteOptionsQuery, [voteOptions.data[i]])
+        console.log('Added vote options')
 
         // add current user to event admins
-        const addToAdminsQuery: string = 'insert into event_admins values (DEFAULT, (DEFAULT, (select u.id from users as u inner join sessions as s on u.id = s.user_id where token = $1 and expires_on>$2), (select max(id) from events)))'
+        const addToAdminsQuery: string = 'insert into event_admins values (DEFAULT, (select u.id from users as u inner join sessions as s on u.id = s.user_id where token = $1 and expires_on>$2), (select max(id) from events))'
         await client.query(addToAdminsQuery, [token.data, getTimeMs()])
+        console.log('Set event admin')
 
         await client.query('COMMIT')
         client.release()

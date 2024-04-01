@@ -25,7 +25,7 @@ import Diversity2OutlinedIcon from '@mui/icons-material/Diversity2Outlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import theme from "@/components/ThemeRegistry/theme";
-import ChatListItem from "@/components/Messages/ChatListItem";
+import ChatListItem from "@/components/list_items/ChatListItem";
 import {ChatListItemProps, CreateNewChatData, FetchError, User} from "@/utils/interfaces";
 import CreateIcon from '@mui/icons-material/Create';
 import MenuItem from "@mui/material/MenuItem";
@@ -63,9 +63,8 @@ export default function MessagesMenu() {
 
     const router = useRouter()
 
-    const getLists = async () => ((await axios.get('/api/messages/chatlist')).data)
-
-    const getUsernames = async () => ((await axios.get('/api/messages/usernames')).data)
+    const getLists = async () => ((await axios.get('/api/messages/chatlist'))?.data)
+    const getUsernames = async () => ((await axios.get('/api/messages/usernames'))?.data)
 
     useEffect(() => {
         const fetchData = async () => {

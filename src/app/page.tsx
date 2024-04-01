@@ -18,19 +18,14 @@ export default function MultiActionAreaCard() {
 
     const router = useRouter()
 
-    const auth = async () => {
-        const res = await axios.get('/api/auth/auth')
-        return res.data
-    }
-
     useEffect(() => {
         const checkAuth = async () => {
-            const data = await auth()
-            setUser(data)
+            const fetchAuth = await axios.get('/api/auth/auth')
+            setUser(fetchAuth.data)
         }
 
         checkAuth().catch((err) => {
-            if (err.response.status === 401)
+            if (err?.response?.status === 401)
                 router.push('/auth/signin')
         })
     }, []);
@@ -67,7 +62,10 @@ export default function MultiActionAreaCard() {
                         alignItems={"center"}
                     >
                         <Card
-                            sx={{borderRadius: 2, boxShadow: 8}}
+                            sx={{
+                                borderRadius: 2,
+                                boxShadow: 8
+                            }}
                         >
                             <CardContent>
                                 <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>

@@ -8,6 +8,7 @@ import {
     DialogTitle,
     Fab,
     FormHelperText,
+    List,
     OutlinedInput,
     Select,
     SelectChangeEvent,
@@ -17,7 +18,7 @@ import {
 import ResponsiveAppBar from "@/components/AppBar/ResponsiveAppBar";
 import React, {useEffect, useRef, useState} from "react";
 import Box from "@mui/material/Box";
-import {EventData, FetchError, User} from "@/utils/interfaces";
+import {EventData, EventListItemProps, FetchError, User} from "@/utils/interfaces";
 import CreateIcon from '@mui/icons-material/Create';
 import Button from "@mui/material/Button";
 import axios from "axios";
@@ -26,7 +27,9 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import MenuItem from "@mui/material/MenuItem";
 import {DatePicker, LocalizationProvider, PickerValidDate, renderTimeViewClock, TimePicker} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {getTimeMillisecondsFromDate, getTimeMs} from "@/utils/utils";
+import {createEventId, getTimeMillisecondsFromDate, getTimeMs} from "@/utils/utils";
+import theme from "@/components/ThemeRegistry/theme";
+import EventListItem from "@/components/list_items/EventListItem";
 
 export default function MessagesMenu() {
     const eventNameRef = useRef(null);
@@ -37,6 +40,8 @@ export default function MessagesMenu() {
     const [memberValues, setMemberValues] = useState<string[]>([])
     const [voteOptions, setVoteOptions] = useState<number[]>([0])
     const [voteEndingTime, setVoteEndingTime] = useState<number>(0)
+
+    const [eventList, setEventList] = useState<EventListItemProps[]>([])
 
     const [eventnameError, setEventnameError] = useState<FetchError>({
         isErr: false,
@@ -71,22 +76,17 @@ export default function MessagesMenu() {
 
     const router = useRouter()
 
-    const getPlans = async () => {
-        const res = await axios.get('')
-        return res.data
-    }
-
-    const getUsernames = async () => ((await axios.get('/api/messages/usernames')).data)
-
     useEffect(() => {
         const fetchData = async () => {
-            //const data = await getLists()
-            const usernamesFetch = await getUsernames()
-            setUsernames(usernamesFetch)
+            const fetchUsernames = await axios.get('/api/messages/usernames')
+            setUsernames(fetchUsernames.data)
+
+            const fetchList = await axios.get('/api/events/list')
+            setEventList(fetchList.data)
         }
 
         fetchData().catch((err) => {
-            if (err.response.status === 401)
+            if (err?.response?.status === 401)
                 router.push('/auth/signin')
         })
     }, []);
@@ -249,12 +249,20 @@ export default function MessagesMenu() {
 
         axios.post('/api/events/post', eventData).then(res => {
             console.log(res)
+            handleClose()
+
+            axios.get('/api/events/list').then(res => {
+                setEventList(res.data)
+            }).catch(err => {
+                if (err?.response?.status === 401)
+                    router.push('/auth/signin')
+            })
         }).catch(err => {
             console.log(err.response)
-            if (err.response.status === 401)
+            if (err?.response?.status === 401)
                 router.push('/auth/signin')
-            else if (err.response.status === 400)
-                setError(err.response.data)
+            else if (err?.response?.status === 400)
+                setError(err?.response?.data)
         })
     }
 
@@ -324,6 +332,7 @@ export default function MessagesMenu() {
                             marginBottom: 1
                         }}
                         fullWidth
+                        multiline
                         id="description"
                         label="Description"
                         name="description"
@@ -592,7 +601,31 @@ export default function MessagesMenu() {
                         width: '100%',
                     }}
                 >
-
+                    <List
+                        sx={{
+                            width: '100%',
+                            maxWidth: 500,
+                            backgroundColor: theme.palette.background.default,
+                        }}
+                    >
+                        {
+                            eventList.map((item: EventListItemProps, index: number) => {
+                                return (
+                                    <EventListItem
+                                        key={index}
+                                        id={item.id}
+                                        event_id={item.event_id}
+                                        eventname={item.eventname}
+                                        decision_date={item.decision_date}
+                                        date={item.date}
+                                        click={(): void => {
+                                            router.push(`/plans/event/${item.event_id}`)
+                                        }}
+                                    />
+                                )
+                            })
+                        }
+                    </List>
                 </Stack>
             </Container>
             <Fab

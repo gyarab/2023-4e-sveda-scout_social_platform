@@ -54,8 +54,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
             email: getUserDataResult.rows[0].email
         }
 
-        console.log(user)
-
         return Response.json(user, {
             status: 200,
         })

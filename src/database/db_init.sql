@@ -73,11 +73,12 @@ create table if not exists sessions
 -- EVENT PLANNING
 create table if not exists events
 (
-    id   bigserial primary key,
-    name varchar not null,
-    description varchar,
-    decision_date bigint not null,
-    date bigint default null -- if null => event is still not closed
+    id            bigserial primary key,
+    event_id      varchar not null,
+    name          varchar not null,
+    description   varchar,
+    decision_date bigint  not null,
+    date          bigint default null -- if null => event is still not closed
 );
 
 create table if not exists event_participants
@@ -97,7 +98,7 @@ create table if not exists event_terms
 create table if not exists event_term_votes
 (
     id      bigserial primary key,
-    vote    integer not null, -- 1 = want to attend; 2 = don't want to attend; 3 = if needed
+    vote    integer not null default 0, -- 0 = no decision; 1 = want to attend; 2 = don't want to attend; 3 = if needed
     user_id bigint  not null references users,
     term_id bigint  not null references event_terms
 );
@@ -105,7 +106,7 @@ create table if not exists event_term_votes
 create table if not exists event_admins
 (
     id       bigserial primary key,
-    user_id bigint not null references users,
+    user_id  bigint not null references users,
     event_id bigint not null references events
 );
 

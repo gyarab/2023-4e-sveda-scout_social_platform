@@ -23,7 +23,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'username',
                 message: JSON.parse(username.error.message)[0].message
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'password',
                 message: JSON.parse(password.error.message)[0].message
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -41,8 +41,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
             username: username.data,
             password: password.data,
         }
-
-        console.log(userData)
 
         await client.query('BEGIN')
 
@@ -58,14 +56,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'username',
                 message: 'This username does not exist'
             }, {
-                status: 401
+                status: 400
             })
         }
 
         // get hashed password
         const getHashedPasswordQuery: string = 'select password from users where username=$1'
         const getHashedPasswordResult: QueryResult = await client.query(getHashedPasswordQuery, [userData.username])
-        console.log(getHashedPasswordResult.rows[0])
 
         const hashedPassword = getHashedPasswordResult.rows[0].password.split('%')
 
@@ -107,8 +104,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         await client.query('COMMIT')
         client.release()
-
-        console.log('gen:', token)
 
         return Response.json('', {
             status: 200,

@@ -21,7 +21,7 @@ export async function GET() {
                 where: 'username',
                 message: 'You are already signed out'
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -39,7 +39,7 @@ export async function GET() {
                 where: 'token',
                 message: 'User is already signed out'
             }, {
-                status: 401
+                status: 400
             })
         }
 

@@ -28,7 +28,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'username',
                 message: JSON.parse(username.error.message)[0].message
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'nickname',
                 message: JSON.parse(nickname.error.message)[0].message
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'email',
                 message: JSON.parse(email.error.message)[0].message
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'password',
                 message: JSON.parse(password.error.message)[0].message
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'passwordAgain',
                 message: JSON.parse(passwordAgain.error.message)[0].message
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'passwordAgain',
                 message: "Passwords do not match"
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'username',
                 message: 'This username is already in use'
             }, {
-                status: 401
+                status: 400
             })
         }
 
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 where: 'email',
                 message: 'This email is used by different account'
             }, {
-                status: 401
+                status: 400
             })
         }
 

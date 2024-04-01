@@ -66,6 +66,7 @@ export default function Chat({params}: { params: { slug: string } }) {
                 console.log(err)
             }
             setMessageInput('')
+            scrollToBottom()
         }
     };
 
@@ -74,13 +75,11 @@ export default function Chat({params}: { params: { slug: string } }) {
         messagesEndRef?.current?.scrollIntoView({behavior: "smooth"})
     }
 
-    const auth = async () => {
-        const res = await axios.get('/api/auth/auth')
-        return res.data
-    }
+    const auth = async () => (await axios.get('/api/auth/auth')).data
+
 
     useEffect(() => {
-        const readInitalData = async () => {
+        const readInitialData = async () => {
             const data = await auth()
             setUser(data)
             try {
@@ -96,7 +95,7 @@ export default function Chat({params}: { params: { slug: string } }) {
             }, 1500)
         }
 
-        readInitalData().catch((err) => {
+        readInitialData().catch((err) => {
             if (err.response.status === 401)
                 router.push('/auth/signin')
         })

@@ -1,15 +1,10 @@
-import {NextRequest, NextResponse} from "next/server";
-import {CreateNewChatData, GetMessageData, LogInUserData, PostMessageData} from "@/utils/interfaces";
-import {SafeParseReturnType, z, ZodArray, ZodString} from 'zod'
+import {NextRequest} from "next/server";
+import {GetMessageData, roomOrEventIdScheme, timeScheme, tokenScheme} from "@/utils/interfaces";
+import {SafeParseReturnType} from 'zod'
 import pool from '../../../../database/db'
 import {PoolClient, QueryResult} from "pg";
-import {getExpirationTime, getTimeMs, hashPassword} from "@/utils/utils";
 import {cookies} from "next/headers";
 import {auth, checkRightsForChat} from "@/database/authentication";
-
-const tokenScheme: ZodString = z.string().length(36)
-const roomIdScheme: ZodString = z.string().length(128)
-const timeScheme: ZodString = z.string()
 
 export async function POST(req: NextRequest) {
     const client: PoolClient = await pool.connect()
@@ -33,7 +28,7 @@ export async function POST(req: NextRequest) {
 
         let userData: GetMessageData = await req.json()
 
-        const roomId: SafeParseReturnType<boolean, string> = roomIdScheme.safeParse(userData.roomId)
+        const roomId: SafeParseReturnType<boolean, string> = roomOrEventIdScheme.safeParse(userData.roomId)
         const time: SafeParseReturnType<boolean, string> = timeScheme.safeParse(userData.time)
         const lastMessageTime: SafeParseReturnType<boolean, string> = timeScheme.safeParse(userData.lastMessageTime)
 

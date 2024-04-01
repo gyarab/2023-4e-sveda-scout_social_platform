@@ -125,7 +125,7 @@ export default function SignUp() {
         }).catch((err) => {
             const errData = err.response.data
 
-            if (err.response.status === 401 && !errData.ok)
+            if (err.response.status === 400 && !errData.ok)
                 markErr(errData.where, errData.message)
 
             console.log(errData)
